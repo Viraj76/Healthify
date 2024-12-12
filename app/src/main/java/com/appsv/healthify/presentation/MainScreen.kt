@@ -1,8 +1,6 @@
 package com.appsv.healthify.presentation
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
+import DiabetesViewModel
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -16,7 +14,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -85,7 +84,12 @@ fun NavHostContainer(navController: NavHostController, modifier: Modifier = Modi
     NavHost(navController = navController, startDestination = NavigationItem.Home.route) {
         composable(NavigationItem.Home.route) { HomeScreen() }
         composable(NavigationItem.Analytics.route) { AnalyticsScreen() }
-        composable(NavigationItem.Heart.route) { HeartScreen() }
+        composable(NavigationItem.Heart.route) {
+            val viewModel : DiabetesViewModel = viewModel()
+            val diabetesState by viewModel.diabetesState.collectAsStateWithLifecycle()
+
+            HeartScreen(viewModel,diabetesState)
+        }
         composable(NavigationItem.Notifications.route) { NotificationsScreen() }
         composable(NavigationItem.Profile.route) { ProfileScreen() }
     }

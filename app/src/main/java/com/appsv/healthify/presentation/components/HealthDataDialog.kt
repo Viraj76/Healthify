@@ -1,5 +1,7 @@
 package com.appsv.healthify.presentation.components
 
+import DiabetesViewModel
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -7,17 +9,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.appsv.healthify.domain.HealthData
+import com.appsv.healthify.Resource
+import com.appsv.healthify.domain.DiabeteseData
+
 
 
 @Composable
 fun HealthDataDialog(
     onDismiss: () -> Unit,
-    onSubmit: (HealthData) -> Unit
+    onSubmit: (DiabeteseData) -> Unit,
+    viewModel: DiabetesViewModel,
 ) {
     var age by remember { mutableStateOf("30") }
     var bmiCategory by remember { mutableStateOf("Normal") }
-    var occupation by remember { mutableStateOf("") }
+    var occupation by remember { mutableStateOf("Nurse") }
     var gender by remember { mutableStateOf("Male") }
     var systolic by remember { mutableStateOf("120") }
     var diastolic by remember { mutableStateOf("80") }
@@ -25,6 +30,8 @@ fun HealthDataDialog(
     var stressLevel by remember { mutableStateOf("3") }
     var dailySteps by remember { mutableStateOf("8000") }
     var errorMessage by remember { mutableStateOf("") }
+
+
 
 
     Dialog(onDismissRequest = onDismiss) {
@@ -116,7 +123,7 @@ fun HealthDataDialog(
                         ) {
                             errorMessage = "Please fill all required fields"
                         } else {
-                            val healthData = HealthData(
+                            val diabeteseData = DiabeteseData(
                                 age = age.toInt(),
                                 bmiCategory = bmiCategory,
                                 occupation = occupation.ifBlank { null },
@@ -127,8 +134,10 @@ fun HealthDataDialog(
                                 stressLevel = stressLevel.toInt(),
                                 dailySteps = dailySteps.toInt()
                             )
-                            onSubmit(healthData)
+                            onSubmit(diabeteseData)
+                            viewModel.predictDiabetes(diabeteseData)
                             onDismiss()
+
                         }
                     }) {
                         Text("Submit")
@@ -138,3 +147,4 @@ fun HealthDataDialog(
         }
     }
 }
+

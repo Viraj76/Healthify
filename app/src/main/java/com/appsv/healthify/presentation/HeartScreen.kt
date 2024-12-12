@@ -1,5 +1,7 @@
 package com.appsv.healthify.presentation
 
+import DiabetesViewModel
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -13,18 +15,60 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.appsv.healthify.Resource
 import com.appsv.healthify.presentation.components.HealthDataDialog
 
 @Composable
-fun HeartScreen() {
+fun HeartScreen(
+    viewModel: DiabetesViewModel,
+    diabetesState: Resource<String>,
+) {
     var showDialog by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
+
+    if (showSuccessDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showSuccessDialog = false
+                viewModel.resetState() // Reset state in ViewModel
+            },
+            title = { Text(text = "Prediction Result") },
+            text = { Text(dialogMessage) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showSuccessDialog = false
+                    viewModel.resetState() // Reset state in ViewModel
+                }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    when (diabetesState) {
+        is Resource.Success -> {
+            if (!showSuccessDialog) {
+                showSuccessDialog = true
+                dialogMessage = diabetesState.data
+            }
+        }
+        is Resource.Error -> {
+            dialogMessage = diabetesState.message ?: "Unknown Error"
+        }
+        is Resource.Loading -> {
+            dialogMessage = "Loading..."
+        }
+    }
 
     if (showDialog) {
         HealthDataDialog(
             onDismiss = { showDialog = false },
             onSubmit = { healthData ->
-                println(healthData)
-            }
+                viewModel.predictDiabetes(healthData)
+                showDialog = false
+            },
+            viewModel = viewModel
         )
     }
 
@@ -61,6 +105,7 @@ fun HeartScreen() {
         )
     }
 }
+
 
 @Composable
 fun GradientButton(text: String, onClick: () -> Unit) {
