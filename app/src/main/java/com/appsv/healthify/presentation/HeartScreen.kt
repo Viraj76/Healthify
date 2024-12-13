@@ -1,7 +1,6 @@
 package com.appsv.healthify.presentation
 
 import DiabetesViewModel
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -17,28 +16,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.appsv.healthify.Resource
 import com.appsv.healthify.presentation.components.HealthDataDialog
+import com.appsv.healthify.presentation.components.HeartDiseaseDialog
+import com.appsv.healthify.presentation.components.SleepDisorderDialog
 
 @Composable
 fun HeartScreen(
     viewModel: DiabetesViewModel,
     diabetesState: Resource<String>,
+    innerPadding: PaddingValues,
 ) {
     var showDialog by remember { mutableStateOf(false) }
+    var showHeartDiseaseDialog by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
+    var showSleepDisorderDialog by remember { mutableStateOf(false) }
 
     if (showSuccessDialog) {
         AlertDialog(
             onDismissRequest = {
                 showSuccessDialog = false
-                viewModel.resetState() // Reset state in ViewModel
+                viewModel.resetState()
             },
             title = { Text(text = "Prediction Result") },
             text = { Text(dialogMessage) },
             confirmButton = {
                 TextButton(onClick = {
                     showSuccessDialog = false
-                    viewModel.resetState() // Reset state in ViewModel
+                    viewModel.resetState()
                 }) {
                     Text("OK")
                 }
@@ -54,12 +58,15 @@ fun HeartScreen(
             }
         }
         is Resource.Error -> {
-            dialogMessage = diabetesState.message ?: "Unknown Error"
+            showSuccessDialog = false
+            dialogMessage = diabetesState.message
         }
         is Resource.Loading -> {
+            showSuccessDialog = false
             dialogMessage = "Loading..."
         }
     }
+
 
     if (showDialog) {
         HealthDataDialog(
@@ -67,45 +74,77 @@ fun HeartScreen(
             onSubmit = { healthData ->
                 viewModel.predictDiabetes(healthData)
                 showDialog = false
+            }
+        )
+    }
+
+    if (showHeartDiseaseDialog) {
+        HeartDiseaseDialog(
+            onDismiss = { showHeartDiseaseDialog = false },
+            onSubmit = { heartDiseaseData ->
+                viewModel.predictHeartDisease(heartDiseaseData)
+                showHeartDiseaseDialog = false
+            }
+        )
+    }
+
+    if(showSleepDisorderDialog){
+        SleepDisorderDialog(
+            onDismiss = {
+                showSleepDisorderDialog = false
             },
-            viewModel = viewModel
+            onSubmit = {
+                viewModel.predictSleepDisorder(it)
+                showSleepDisorderDialog = false
+            }
         )
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFff9a9e),
+                        Color(0xFFfad0c4)
+                    )
+                )
+            )
+            .padding(innerPadding)
+            .padding(16.dp)
+            .statusBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Heart Screen",
+            text = "Predict Disease",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
+            color = Color.Black,
             modifier = Modifier
-                .align(Alignment.Start)
+                .align(Alignment.CenterHorizontally)
                 .padding(bottom = 32.dp)
         )
 
         GradientButton(
-            text = "Open Dialog",
+            text = "Predict Diabetes Disease",
             onClick = { showDialog = true }
         )
         Spacer(modifier = Modifier.height(16.dp))
         GradientButton(
-            text = "Button 2",
-            onClick = { println("Button 2 clicked") }
+            text = "Predict Heart Disease",
+            onClick = { showHeartDiseaseDialog = true }
         )
         Spacer(modifier = Modifier.height(16.dp))
         GradientButton(
-            text = "Button 3",
-            onClick = { println("Button 3 clicked") }
+            text = "Predict Sleep Disorder",
+            onClick = {
+                showSleepDisorderDialog = true
+            }
         )
     }
 }
-
 
 @Composable
 fun GradientButton(text: String, onClick: () -> Unit) {

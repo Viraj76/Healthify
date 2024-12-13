@@ -85,10 +85,7 @@ fun NavHostContainer(navController: NavHostController, modifier: Modifier = Modi
         composable(NavigationItem.Home.route) { HomeScreen() }
         composable(NavigationItem.Analytics.route) { AnalyticsScreen() }
         composable(NavigationItem.Heart.route) {
-            val viewModel : DiabetesViewModel = viewModel()
-            val diabetesState by viewModel.diabetesState.collectAsStateWithLifecycle()
 
-            HeartScreen(viewModel,diabetesState)
         }
         composable(NavigationItem.Notifications.route) { NotificationsScreen() }
         composable(NavigationItem.Profile.route) { ProfileScreen() }

@@ -1,7 +1,6 @@
 package com.appsv.healthify.presentation.components
 
 import DiabetesViewModel
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -9,29 +8,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.appsv.healthify.Resource
-import com.appsv.healthify.domain.DiabeteseData
-
-
+import com.appsv.healthify.domain.HeartDiseaseData
 
 @Composable
-fun HealthDataDialog(
+fun HeartDiseaseDialog(
     onDismiss: () -> Unit,
-    onSubmit: (DiabeteseData) -> Unit,
+    onSubmit: (HeartDiseaseData) -> Unit,
 ) {
-    var age by remember { mutableStateOf("30") }
-    var bmiCategory by remember { mutableStateOf("Normal") }
-    var occupation by remember { mutableStateOf("Nurse") }
+    var age by remember { mutableStateOf("50") }
+    var bmiCategory by remember { mutableStateOf("Overweight") }
+    var occupation by remember { mutableStateOf("Doctor") }
     var gender by remember { mutableStateOf("Male") }
-    var systolic by remember { mutableStateOf("120") }
-    var diastolic by remember { mutableStateOf("80") }
-    var heartRate by remember { mutableStateOf("72") }
-    var stressLevel by remember { mutableStateOf("3") }
-    var dailySteps by remember { mutableStateOf("8000") }
+    var systolic by remember { mutableStateOf("130") }
+    var diastolic by remember { mutableStateOf("90") }
+    var heartRate by remember { mutableStateOf("88") }
+    var stressLevel by remember { mutableStateOf("8") }
     var errorMessage by remember { mutableStateOf("") }
-
-
-
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -60,7 +52,7 @@ fun HealthDataDialog(
                 OutlinedTextField(
                     value = occupation,
                     onValueChange = { occupation = it },
-                    label = { Text("Occupation (Optional)") },
+                    label = { Text("Occupation") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
@@ -93,12 +85,6 @@ fun HealthDataDialog(
                     label = { Text("Stress Level") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                OutlinedTextField(
-                    value = dailySteps,
-                    onValueChange = { dailySteps = it },
-                    label = { Text("Daily Steps") },
-                    modifier = Modifier.fillMaxWidth()
-                )
                 if (errorMessage.isNotEmpty()) {
                     Text(
                         text = errorMessage,
@@ -118,11 +104,11 @@ fun HealthDataDialog(
                     Button(onClick = {
                         if (age.isBlank() || bmiCategory.isBlank() || gender.isBlank()
                             || systolic.isBlank() || diastolic.isBlank()
-                            || heartRate.isBlank() || stressLevel.isBlank() || dailySteps.isBlank()
+                            || heartRate.isBlank() || stressLevel.isBlank()
                         ) {
                             errorMessage = "Please fill all required fields"
                         } else {
-                            val diabeteseData = DiabeteseData(
+                            val heartDiseaseData = HeartDiseaseData(
                                 age = age.toInt(),
                                 bmiCategory = bmiCategory,
                                 occupation = occupation.ifBlank { null },
@@ -130,12 +116,10 @@ fun HealthDataDialog(
                                 systolic = systolic.toInt(),
                                 diastolic = diastolic.toInt(),
                                 heartRate = heartRate.toInt(),
-                                stressLevel = stressLevel.toInt(),
-                                dailySteps = dailySteps.toInt()
+                                stressLevel = stressLevel.toInt()
                             )
-                            onSubmit(diabeteseData)
+                            onSubmit(heartDiseaseData)
                             onDismiss()
-
                         }
                     }) {
                         Text("Submit")
@@ -145,4 +129,3 @@ fun HealthDataDialog(
         }
     }
 }
-
